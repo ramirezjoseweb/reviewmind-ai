@@ -1,0 +1,15 @@
+services: 
+  postgres: 
+    image: postgres:17
+    container_name: reviewmind-postgres
+    environment: 
+      POSTGRES_DB: reviewmind
+      POSTGRES_USER: reviewmind_user
+      POSTGRES_PASSWORD: reviewmind_password
+    ports: 
+      - "5432:5432"
+    volumes:
+      - "reviewmind_postgres_data:/var/lib/postgresql/data"
+
+volumes: 
+  reviewmind_postgres_data:
