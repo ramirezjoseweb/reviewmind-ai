@@ -27,3 +27,4 @@ def health_check():
 
 "fastapi dev app/main.py"
 "docker compose up -d"
+"npm run dev"
