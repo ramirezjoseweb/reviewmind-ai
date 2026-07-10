@@ -1,4 +1,4 @@
-from pydantic import BaseSettings # import para configurar variables de entorno
+from pydantic_settings import BaseSettings # import para configurar variables de entorno
 
 class Settings(BaseSettings): # la clase Settings hereda de BaseSettings, lo que permite definir variables de entorno y sus valores predeterminados.
     database_url: str
