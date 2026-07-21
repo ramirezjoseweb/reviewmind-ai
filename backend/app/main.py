@@ -26,6 +26,7 @@ app.add_middleware(
 )
 
 app.include_router(businesses.router) # incluye el enrutador de negocios en la aplicación FastAPI, lo que permite que las rutas definidas en el enrutador estén disponibles en la API. Esto organiza las rutas relacionadas con los negocios en un solo lugar y facilita su mantenimiento y escalabilidad.
+
 @app.get("/")
 def root(): 
     return{
@@ -39,6 +40,9 @@ def health_check():
         "status": "OK"
     }
 
-"fastapi dev app/main.py || uvicorn app.main:app --reload"
-"docker compose up -d"
-"npm run dev"
+#fastapi dev app/main.py || uvicorn app.main:app --reload
+#docker compose up -d
+#npm run dev
+
+#lanzar postgressql
+#docker exec -it reviewmind-postgres psql -U reviewmind_user -d reviewmind
