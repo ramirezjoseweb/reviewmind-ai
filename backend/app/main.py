@@ -3,7 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.db.database import Base, engine
 from app.models.business import Business
-from app.routers import businesses
+from app.models.review import Review
+from app.routers import businesses, reviews
 
 Base.metadata.create_all(bind=engine) # crea todas las tablas definidas en la clase Base en la base de datos, utilizando el motor de base de datos especificado en la variable engine. Esto asegura que todas las tablas necesarias estén presentes en la base de datos antes de que se realicen operaciones en ella.
 
@@ -26,6 +27,8 @@ app.add_middleware(
 )
 
 app.include_router(businesses.router) # incluye el enrutador de negocios en la aplicación FastAPI, lo que permite que las rutas definidas en el enrutador estén disponibles en la API. Esto organiza las rutas relacionadas con los negocios en un solo lugar y facilita su mantenimiento y escalabilidad.
+app.include_router(reviews.router)
+
 
 @app.get("/")
 def root(): 
