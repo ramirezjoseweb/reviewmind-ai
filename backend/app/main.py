@@ -29,7 +29,6 @@ app.add_middleware(
 app.include_router(businesses.router) # incluye el enrutador de negocios en la aplicación FastAPI, lo que permite que las rutas definidas en el enrutador estén disponibles en la API. Esto organiza las rutas relacionadas con los negocios en un solo lugar y facilita su mantenimiento y escalabilidad.
 app.include_router(reviews.router)
 
-
 @app.get("/")
 def root(): 
     return{
