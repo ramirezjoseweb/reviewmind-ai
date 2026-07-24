@@ -43,6 +43,6 @@ class Review(Base):
     analysis: Mapped["ReviewAnalysis | None"] = relationship(
         "Analysis", 
         back_populates= "review", 
-        cascade="all, cascade-orphan", 
+        cascade="all, delete-orphan", 
         uselist=False, 
     )
