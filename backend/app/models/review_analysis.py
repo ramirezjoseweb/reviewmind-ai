@@ -7,7 +7,7 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import ForeignKey, String, JSON, DateTime
+from sqlalchemy import ForeignKey, String, JSON, DateTime, Float
 
 from app.models.review import Review
 
@@ -17,13 +17,14 @@ class ReviewAnalysis(Base):
 
     id: Mapped[int] = mapped_column(
         ForeignKey("reviews.id", ondelete="CASCADE"), 
+        primary_key=True,
         nullable=False, 
         index=True,
         unique=True, 
     )
 
     sentiment: Mapped[str] = mapped_column(String(20), nullable=False)
-    sentiment_score: Mapped[float] = mapped_column(float, nullable=False)
+    sentiment_score: Mapped[float] = mapped_column(Float, nullable=False)
 
     positive_aspects: Mapped[list[str]] = mapped_column(
         JSON, 

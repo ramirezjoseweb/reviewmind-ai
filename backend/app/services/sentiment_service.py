@@ -157,7 +157,7 @@ def calculate_sentence_score(sentence: str) -> int:
 
     return positive_hits - negative_hits
 
-def analysis_review_text(text: str) -> dict: 
+def analyze_review_text(text: str) -> dict: 
     sentences = split_sentences(text) 
 
     total_score = 0 
