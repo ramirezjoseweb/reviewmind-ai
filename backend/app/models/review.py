@@ -41,7 +41,7 @@ class Review(Base):
     ) # esto establece una relación bidireccional entre la clase Review y la clase Business. La propiedad "business" en la clase Review permite acceder al negocio asociado a una reseña, mientras que la propiedad "reviews" en la clase Business permite acceder a todas las reseñas asociadas a ese negocio.
 
     analysis: Mapped["ReviewAnalysis | None"] = relationship(
-        "Analysis", 
+        "ReviewAnalysis", 
         back_populates= "review", 
         cascade="all, delete-orphan", 
         uselist=False, 

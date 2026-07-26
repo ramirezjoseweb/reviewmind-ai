@@ -3,7 +3,8 @@ import unicodedata
 
 POSITIVE_WORDS = {
     "bueno", 
-    "buena", 
+    "buena",
+    "buen", 
     "buenisimo", 
     "buenisima", 
     "excelente",
@@ -161,14 +162,14 @@ def analyze_review_text(text: str) -> dict:
     sentences = split_sentences(text) 
 
     total_score = 0 
-    positive_aspects = set[str] = set() 
-    negative_aspects = set[str] = set() 
+    positive_aspects:  set[str] = set() 
+    negative_aspects: set[str] = set() 
 
     for sentence in sentences: 
         sentence_score = calculate_sentence_score(sentence) 
         aspects = detect_aspects(sentence) 
 
-        total_score += sentence.score
+        total_score += sentence_score
 
         if sentence_score > 0: 
             positive_aspects.update(aspects) 
@@ -187,6 +188,6 @@ def analyze_review_text(text: str) -> dict:
     return {
         "sentiment": sentiment, 
         "sentiment_score": sentiment_score,
-        "positive_aspects": positive_aspects, 
-        "negaitive_aspects": negative_aspects, 
+        "positive_aspects": sorted(positive_aspects), 
+        "negative_aspects": sorted(negative_aspects), 
     }

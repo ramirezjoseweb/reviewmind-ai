@@ -47,3 +47,7 @@ class ReviewAnalysis(Base):
     review: Mapped["Review"] = relationship(
         back_populates="analysis", 
     )
+
+    @property
+    def review_id(self) -> int:
+        return self.id

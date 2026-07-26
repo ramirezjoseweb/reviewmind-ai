@@ -44,15 +44,15 @@ def run_business_analysis(
         )
 
     for review in reviews: 
-        result = analyze_review_text(result.text) 
+        result = analyze_review_text(review.text) 
 
         existing_analysis = db.scalar(
-            select(ReviewAnalysis).where(ReviewAnalysis.review_id == review.id) 
+            select(ReviewAnalysis).where(ReviewAnalysis.id == review.id) 
         )
 
         if existing_analysis is None: 
             analysis = ReviewAnalysis(
-                review_id=review.id, 
+                id=review.id, 
                 sentiment=result["sentiment"], 
                 sentiment_score=result["sentiment_score"],
                 positive_aspects=result["positive_aspects"], 
