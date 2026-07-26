@@ -78,7 +78,7 @@ def run_business_analysis(
 
 @router.get(
     "", 
-    response_model=list[ReviewAnalysisReponse], 
+    response_model=BusinessAnalysisSummary, 
 )
 def list_business_analysis(
     business_id: int, 
