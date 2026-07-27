@@ -1,0 +1,102 @@
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000"; 
+
+export type Business = {
+    id: number; 
+    name: string; 
+    category: string; 
+    location: string | null;
+    created_at: string;  
+}; 
+
+export type BusinessCreate = {
+    name: string;
+    category: string; 
+    location?: string;
+};
+
+export type ReviewCreate = {
+    text: string; 
+    rating?: number; 
+    author?: string; 
+    source?: string; 
+    language?: string; 
+}
+
+export type AnalysisSummary = {
+    business_id: number; 
+    total_reviews: number; 
+    analyzed_reviews: number; 
+    positive_reviews: number; 
+    negative_reviews: number; 
+    neutral_reviews: number; 
+    average_sentiment_score: number; 
+    top_positive_aspects: string[]; 
+    top_negative_aspects: string[]; 
+}
+
+async function handleResponse<T>(response: Response): Promise<T> {
+    if(!response.ok) {
+        const errorBody = await response.json().catch(() => null); 
+        const errorMessage = 
+            errorBody?.detail ?? `HTTP error ${response.status}`; 
+
+        throw new Error(errorMessage); 
+    }
+
+    return response.json() 
+}
+
+export async function getBusinesses(): Promise<Business[]> {
+    const response = await fetch(`${API_URL}/businesses`); 
+    return handleResponse<Business[]>(response);
+}
+
+export async function createBusiness(
+    business: BusinessCreate
+): Promise<Business> {
+    const response = await fetch(`${API_URL}/businesses`, {
+        method: "POST",  
+        headers: {
+            "Content-Type": "application/json", 
+        }, 
+        body: JSON.stringify(business), 
+    }); 
+
+    return handleResponse(response); 
+}
+
+export async function createReview(
+    businessId: number, 
+    review: ReviewCreate
+): Promise<void> {
+    const response = await fetch(`${API_URL}/businesses/${businessId}/reviews`, {
+        method: "POST", 
+        headers: {
+            "Content-Type": "application/json", 
+        }, 
+        body: JSON.stringify(review), 
+    }); 
+
+    await handleResponse(response);
+}
+
+export async function runAnalysis(
+    businessId: number, 
+): Promise<void> {
+    const response = await fetch(
+        `${API_URL}/businesses/${businessId}/analysis`, 
+        {
+            method: "POST", 
+        }
+    ); 
+
+    await handleResponse(response) 
+}
+
+export async function getAnalysisSummary(
+    businessId: number, 
+): Promise <AnalysisSummary> {
+    const response = await fetch(`${API_URL}/businesses/${businessId}/analysis/summary`); 
+    
+    return handleResponse(response) 
+}
