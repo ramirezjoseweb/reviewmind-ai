@@ -129,8 +129,69 @@ def list_business_analysis(
         negative_reviews=negative_reviews, 
         average_sentiment_score=round(average_sentiment_score, 2), 
         top_positive_aspects=[
+            # Obtiene los 5 aspectos positivos más frecuentes
             aspect for aspect, _ in positive_counter.most_common(5)
         ], 
+        top_negative_aspects=[
+            aspect for aspect, _ in negative_counter.most_common(5)
+        ], 
+    )
+
+@router.get(
+    "/summary", 
+    response_model=BusinessAnalysisSummary
+) 
+def get_business_analysis_summary(
+    business_id: int, 
+    db: Session = Depends(get_db) 
+): 
+    business = db.get(Business, business_id) 
+
+    if business is None: 
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail="Negocio no encontrado", 
+        )
+
+    reviews = db.scalars(
+        select(Review).where(Review.business_id == business_id) 
+    ).all() 
+
+    analyses = db.scalars(
+        select(ReviewAnalysis)
+        .join(Review)
+        .where(Review.business_id == business_id)
+    ).all() 
+
+    positive_reviews = sum(1 for analysis in reviews if analysis.sentiment == "positive") 
+    negative_reviews = sum(1 for analysis in reviews if analysis.sentiment == "negative") 
+    neutral_reviews = sum(1 for analysis in reviews if analysis.sentiment == "neutral") 
+
+    if analyses: 
+        average_sentiment_score = sum(
+            analysis.sentiment_score for analysis in analyses
+        ) / len(analyses)
+    else: 
+        average_sentiment_score = 0
+
+    positive_counter: Counter[str] = Counter() 
+    negative_counter: Counter[str] = Counter() 
+
+    for analysis in analyses: 
+        positive_counter.update(analysis.positive_aspects)
+        negative_counter.update(analysis.negative_aspects)
+
+    return BusinessAnalysisSummary(
+        business_id=business_id, 
+        total_reviews=len(reviews), 
+        analyzed_reviews=len(analyses), 
+        positive_reviews=positive_reviews, 
+        negative_reviews=negative_reviews,
+        neutral_reviews=neutral_reviews,
+        average_sentiment_score=round(average_sentiment_score, 2), 
+        top_positive_aspects=[
+            aspect for aspect, _ in positive_counter.most_common(5) 
+        ],
         top_negative_aspects=[
             aspect for aspect, _ in negative_counter.most_common(5)
         ], 
