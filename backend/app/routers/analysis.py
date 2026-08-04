@@ -154,7 +154,7 @@ def get_business_analysis_summary(
         )
 
     reviews = db.scalars(
-        select(Review).where(Review.business_id == business_id) 
+        select(ReviewAnalysis).where(Review.business_id == business_id) 
     ).all() 
 
     analyses = db.scalars(
