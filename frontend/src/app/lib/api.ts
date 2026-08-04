@@ -84,7 +84,7 @@ export async function runAnalysis(
     businessId: number, 
 ): Promise<void> {
     const response = await fetch(
-        `${API_URL}/businesses/${businessId}/analysis`, 
+        `${API_URL}/businesses/${businessId}/analysis/run`, 
         {
             method: "POST", 
         }

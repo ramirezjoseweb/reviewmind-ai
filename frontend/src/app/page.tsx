@@ -217,7 +217,7 @@ export default function Home() {
 
                 <button
                   disabled={loading}
-                  className="w-full rounded-lg bg-cyan-400 px-4 py-2 font-semibold text-slate-950 transition hover:bg-cyan-300 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="w-full rounded-lg bg-cyan-400 hover:opacity-60 px-4 py-2 font-semibold text-slate-950 transition hover:bg-cyan-300 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {loading ? "Procesando..." : "Crear negocio"}
                 </button>
