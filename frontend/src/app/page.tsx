@@ -29,7 +29,7 @@ export default function Home() {
   const [reviewText, setReviewText] = useState(""); 
   const [reviewRating, setReviewRating] = useState(5); 
   const [reviewAuthor, setReviewAutor] = useState(""); 
-  const [review, setReviews] = useState<Review[]>([]); 
+  const [reviews, setReviews] = useState<Review[]>([]); 
 
   const [summary, setSummary] = useState<AnalysisSummary | null>(null); 
   const [error, setError] = useState(""); 
@@ -145,6 +145,8 @@ export default function Home() {
       setReviewText(""); 
       setReviewRating(5); 
       setReviewAutor(""); 
+
+      await loadReviews(selectedBusiness.id);
     } catch(error) {
       setError(error instanceof Error ? error.message : "Error creando la reseña"); 
     } finally {
@@ -351,6 +353,7 @@ export default function Home() {
             </div>
 
             <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+            
               <h2 className="text-xl font-semibold">Resumen del análisis</h2>
 
               {summary ? (
@@ -400,6 +403,63 @@ export default function Home() {
                   pulsa “Ejecutar análisis”.
                 </p>
               )}
+
+  <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6 mt-6">
+  <div className="flex items-center justify-between gap-4">
+    <h2 className="text-xl font-semibold">Reseñas guardadas</h2>
+    <span className="rounded-full bg-slate-950 px-3 py-1 text-sm text-slate-400">
+      {reviews.length} reseñas
+    </span>
+  </div>
+
+  {selectedBusiness ? (
+    reviews.length > 0 ? (
+      <div className="mt-5 space-y-4">
+        {reviews.map((review) => (
+          <article
+            key={review.id}
+            className="rounded-xl border border-slate-800 bg-slate-950 p-4"
+          >
+            <div className="flex flex-wrap items-center gap-2 text-xs text-slate-400">
+              <span className="rounded-full bg-slate-900 px-2 py-1">
+                Rating: {review.rating ?? "Sin rating"}
+              </span>
+
+              <span className="rounded-full bg-slate-900 px-2 py-1">
+                Autor: {review.author || "Anónimo"}
+              </span>
+
+              <span className="rounded-full bg-slate-900 px-2 py-1">
+                Fuente: {review.source || "manual"}
+              </span>
+
+              <span className="rounded-full bg-slate-900 px-2 py-1">
+                Idioma: {review.language || "N/D"}
+              </span>
+            </div>
+
+            <p className="mt-3 text-sm leading-6 text-slate-300">
+              {review.text}
+            </p>
+
+            <p className="mt-3 text-xs text-slate-500">
+              Creada el{" "}
+              {new Date(review.created_at).toLocaleString("es-ES")}
+            </p>
+          </article>
+        ))}
+      </div>
+    ) : (
+      <p className="mt-4 text-sm text-slate-400">
+        Este negocio todavía no tiene reseñas guardadas.
+      </p>
+    )
+  ) : (
+    <p className="mt-4 text-sm text-slate-400">
+      Selecciona un negocio para ver sus reseñas.
+    </p>
+  )}
+</div>
             </div>
           </div>
         </section>
