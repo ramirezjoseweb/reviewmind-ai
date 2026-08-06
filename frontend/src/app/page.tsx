@@ -35,6 +35,12 @@ export default function Home() {
   const [error, setError] = useState(""); 
   const [loading, setLoading] = useState(false); 
 
+  const [showAllReviews, setShowAllReviews] = useState(false); 
+
+
+  const visibleReviews = showAllReviews ? reviews : reviews.slice(0, 3); 
+  const hasMoreReviews = reviews.length > 3;
+
   async function loadBusinesses() {
     try{
       setError("");
@@ -87,6 +93,8 @@ export default function Home() {
   // Esto permite cargar el resumen de análisis correspondiente
   // al negocio que el usuario haya seleccionado.
   useEffect(() => {
+    setShowAllReviews(false); 
+
     if (selectedBusiness) {
       loadSummary(selectedBusiness.id);
       loadReviews(selectedBusiness.id);
@@ -415,7 +423,7 @@ export default function Home() {
   {selectedBusiness ? (
     reviews.length > 0 ? (
       <div className="mt-5 space-y-4">
-        {reviews.map((review) => (
+        {visibleReviews.map((review) => (
           <article
             key={review.id}
             className="rounded-xl border border-slate-800 bg-slate-950 p-4"
@@ -448,6 +456,17 @@ export default function Home() {
             </p>
           </article>
         ))}
+
+        {hasMoreReviews && (
+          <button
+            onClick={() => setShowAllReviews((currentValue) => !currentValue)}
+            className="mt-2 w-full rounded-lg border border-slate-700 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:border-cyan-400 hover:text-cyan-300"
+            >
+              {showAllReviews
+                ? "Ver menos"
+                : `Ver más (${reviews.length - 3} más)`}
+            </button>
+        )}
       </div>
     ) : (
       <p className="mt-4 text-sm text-slate-400">
