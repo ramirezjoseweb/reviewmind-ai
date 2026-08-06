@@ -5,10 +5,12 @@ import { FormEvent, useEffect, useState } from "react";
 import {
   AnalysisSummary,
   Business, 
+  Review, 
   createBusiness, 
   createReview,
   getAnalysisSummary,
   getBusinesses, 
+  getReviews, 
   runAnalysis,
 } from "@/app/lib/api"; 
 
@@ -27,6 +29,7 @@ export default function Home() {
   const [reviewText, setReviewText] = useState(""); 
   const [reviewRating, setReviewRating] = useState(5); 
   const [reviewAuthor, setReviewAutor] = useState(""); 
+  const [review, setReviews] = useState<Review[]>([]); 
 
   const [summary, setSummary] = useState<AnalysisSummary | null>(null); 
   const [error, setError] = useState(""); 
@@ -61,6 +64,17 @@ export default function Home() {
     }
   }
 
+  async function loadReviews(businessId: number) {
+    try {
+      setError(""); 
+      const data = await getReviews(businessId); 
+      setReviews(data); 
+    } catch (error) {
+      setReviews([]); 
+      setError(error instanceof Error ? error.message : "Error al obtener reseñas");
+    }
+  }
+
   // Cargamos los negocios al montar el componente.
   // El array de dependencia vacío [] asegura que la llamada
   // se ejecute solo una vez y no en cada renderizado.
@@ -75,6 +89,11 @@ export default function Home() {
   useEffect(() => {
     if (selectedBusiness) {
       loadSummary(selectedBusiness.id);
+      loadReviews(selectedBusiness.id);
+    }
+    else {
+      setReviews([]); 
+      setSummary(null); 
     }
   }, [selectedBusiness]); 
 
