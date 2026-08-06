@@ -20,7 +20,7 @@ export type ReviewCreate = {
     author?: string; 
     source?: string; 
     language?: string; 
-}
+}; 
 
 export type AnalysisSummary = {
     business_id: number; 
@@ -32,7 +32,18 @@ export type AnalysisSummary = {
     average_sentiment_score: number; 
     top_positive_aspects: string[]; 
     top_negative_aspects: string[]; 
-}
+}; 
+
+export type Review = {
+    id: number; 
+    business_id: number; 
+    text: string; 
+    rating : number | null;
+    author: string | null; 
+    source: string | null; 
+    language: string | null; 
+    created_at: string; 
+}; 
 
 async function handleResponse<T>(response: Response): Promise<T> {
     if(!response.ok) {
@@ -98,5 +109,14 @@ export async function getAnalysisSummary(
 ): Promise <AnalysisSummary> {
     const response = await fetch(`${API_URL}/businesses/${businessId}/analysis/summary`); 
     
+    return handleResponse(response) 
+}
+
+export async function getReviews(
+    businessId: number, 
+): Promise<Review[]> {
+    const response = await fetch(
+        `${API_URL}/businesses/${businessId}/reviews`
+    )
     return handleResponse(response) 
 }
