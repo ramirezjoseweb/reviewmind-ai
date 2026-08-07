@@ -201,287 +201,262 @@ export default function Home() {
         )}
 
         <section className="grid gap-6 lg:grid-cols-[1fr_1.4fr]">
-          <div className="space-y-6">
-            <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
-              <h2 className="text-xl font-semibold">Crear negocio</h2>
+  {/* Fila 1 - Crear negocio */}
+  <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+    <h2 className="text-xl font-semibold">Crear negocio</h2>
 
-              <form onSubmit={handleCreateBusiness} className="mt-5 space-y-4">
-                <div>
-                  <label className="text-sm text-slate-300">Nombre</label>
-                  <input
-                    value={businessName}
-                    onChange={(event) => setBusinessName(event.target.value)}
-                    className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 outline-none focus:border-cyan-400"
-                    placeholder="Hotel Granada Centro"
-                    required
-                  />
-                </div>
+    <form onSubmit={handleCreateBusiness} className="mt-5 space-y-4">
+      <div>
+        <label className="text-sm text-slate-300">Nombre</label>
+        <input
+          value={businessName}
+          onChange={(event) => setBusinessName(event.target.value)}
+          className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 outline-none focus:border-cyan-400"
+          placeholder="Hotel Granada Centro"
+          required
+        />
+      </div>
 
-                <div>
-                  <label className="text-sm text-slate-300">Categoría</label>
-                  <select
-                    value={businessCategory}
-                    onChange={(event) =>
-                      setBusinessCategory(event.target.value)
-                    }
-                    className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 outline-none focus:border-cyan-400"
-                  >
-                    <option value="hotel">Hotel</option>
-                    <option value="restaurant">Restaurante</option>
-                    <option value="product">Producto</option>
-                  </select>
-                </div>
+      <div>
+        <label className="text-sm text-slate-300">Categoría</label>
+        <select
+          value={businessCategory}
+          onChange={(event) => setBusinessCategory(event.target.value)}
+          className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 outline-none focus:border-cyan-400"
+        >
+          <option value="hotel">Hotel</option>
+          <option value="restaurant">Restaurante</option>
+          <option value="product">Producto</option>
+        </select>
+      </div>
 
-                <div>
-                  <label className="text-sm text-slate-300">Ubicación</label>
-                  <input
-                    value={businessLocation}
-                    onChange={(event) =>
-                      setBusinessLocation(event.target.value)
-                    }
-                    className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 outline-none focus:border-cyan-400"
-                    placeholder="Granada"
-                  />
-                </div>
+      <div>
+        <label className="text-sm text-slate-300">Ubicación</label>
+        <input
+          value={businessLocation}
+          onChange={(event) => setBusinessLocation(event.target.value)}
+          className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 outline-none focus:border-cyan-400"
+          placeholder="Granada"
+        />
+      </div>
 
-                <button
-                  disabled={loading}
-                  className="w-full rounded-lg bg-cyan-400 hover:opacity-60 px-4 py-2 font-semibold text-slate-950 transition hover:bg-cyan-300 disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  {loading ? "Procesando..." : "Crear negocio"}
-                </button>
-              </form>
-            </div>
-
-            <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
-              <h2 className="text-xl font-semibold">Negocios</h2>
-
-              <div className="mt-5 space-y-3">
-                {businesses.length === 0 && (
-                  <p className="text-sm text-slate-400">
-                    Todavía no hay negocios creados.
-                  </p>
-                )}
-
-                {businesses.map((business) => (
-                  <button
-                    key={business.id}
-                    onClick={() => setSelectedBusiness(business)}
-                    className={`w-full rounded-xl border p-4 text-left transition ${
-                      selectedBusiness?.id === business.id
-                        ? "border-cyan-400 bg-cyan-400/10"
-                        : "border-slate-800 bg-slate-950 hover:border-slate-600"
-                    }`}
-                  >
-                    <p className="font-semibold">{business.name}</p>
-                    <p className="text-sm text-slate-400">
-                      {business.category}
-                      {business.location ? ` · ${business.location}` : ""}
-                    </p>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-6">
-            <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
-              <h2 className="text-xl font-semibold">
-                {selectedBusiness
-                  ? selectedBusiness.name
-                  : "Selecciona un negocio"}
-              </h2>
-
-              {selectedBusiness ? (
-                <form onSubmit={handleCreateReview} className="mt-5 space-y-4">
-                  <div>
-                    <label className="text-sm text-slate-300">Reseña</label>
-                    <textarea
-                      value={reviewText}
-                      onChange={(event) => setReviewText(event.target.value)}
-                      className="mt-1 min-h-32 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 outline-none focus:border-cyan-400"
-                      placeholder="El hotel estaba muy limpio y el personal fue muy amable, aunque había ruido por la noche."
-                      required
-                    />
-                  </div>
-
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div>
-                      <label className="text-sm text-slate-300">
-                        Puntuación
-                      </label>
-                      <input
-                        type="number"
-                        min={1}
-                        max={5}
-                        value={reviewRating}
-                        onChange={(event) =>
-                          setReviewRating(Number(event.target.value))
-                        }
-                        className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 outline-none focus:border-cyan-400"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="text-sm text-slate-300">Autor</label>
-                      <input
-                        value={reviewAuthor}
-                        onChange={(event) =>
-                          setReviewAutor(event.target.value)
-                        }
-                        className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 outline-none focus:border-cyan-400"
-                        placeholder="Nombre"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col gap-3 md:flex-row">
-                    <button
-                      disabled={loading}
-                      className="rounded-lg bg-white px-4 py-2 font-semibold text-slate-950 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                      Añadir reseña
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={handleRunAnalysis}
-                      disabled={loading}
-                      className="rounded-lg border border-cyan-400 px-4 py-2 font-semibold text-cyan-300 transition hover:bg-cyan-400/10 disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                      Ejecutar análisis
-                    </button>
-                  </div>
-                </form>
-              ) : (
-                <p className="mt-4 text-sm text-slate-400">
-                  Crea o selecciona un negocio para añadir reseñas.
-                </p>
-              )}
-            </div>
-
-            <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
-            
-              <h2 className="text-xl font-semibold">Resumen del análisis</h2>
-
-              {summary ? (
-                <div className="mt-5 space-y-6">
-                  <div className="grid gap-4 md:grid-cols-4">
-                    <SummaryCard
-                      label="Reseñas"
-                      value={summary.total_reviews}
-                    />
-                    <SummaryCard
-                      label="Positivas"
-                      value={summary.positive_reviews}
-                    />
-                    <SummaryCard
-                      label="Neutras"
-                      value={summary.neutral_reviews}
-                    />
-                    <SummaryCard
-                      label="Negativas"
-                      value={summary.negative_reviews}
-                    />
-                  </div>
-
-                  <div className="rounded-xl border border-slate-800 bg-slate-950 p-4">
-                    <p className="text-sm text-slate-400">
-                      Sentimiento medio
-                    </p>
-                    <p className="mt-1 text-3xl font-bold">
-                      {summary.average_sentiment_score}
-                    </p>
-                  </div>
-
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <AspectList
-                      title="Aspectos positivos"
-                      aspects={summary.top_positive_aspects}
-                    />
-                    <AspectList
-                      title="Aspectos negativos"
-                      aspects={summary.top_negative_aspects}
-                    />
-                  </div>
-                </div>
-              ) : (
-                <p className="mt-4 text-sm text-slate-400">
-                  Todavía no hay análisis para este negocio. Añade reseñas y
-                  pulsa “Ejecutar análisis”.
-                </p>
-              )}
-
-  <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6 mt-6">
-  <div className="flex items-center justify-between gap-4">
-    <h2 className="text-xl font-semibold">Reseñas guardadas</h2>
-    <span className="rounded-full bg-slate-950 px-3 py-1 text-sm text-slate-400">
-      {reviews.length} reseñas
-    </span>
+      <button
+        disabled={loading}
+        className="w-full rounded-lg bg-cyan-400 px-4 py-2 font-semibold text-slate-950 transition hover:bg-cyan-300 disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        {loading ? "Procesando..." : "Crear negocio"}
+      </button>
+    </form>
   </div>
 
-  {selectedBusiness ? (
-    reviews.length > 0 ? (
-      <div className="mt-5 space-y-4">
-        {visibleReviews.map((review) => (
-          <article
-            key={review.id}
-            className="rounded-xl border border-slate-800 bg-slate-950 p-4"
-          >
-            <div className="flex flex-wrap items-center gap-2 text-xs text-slate-400">
-              <span className="rounded-full bg-slate-900 px-2 py-1">
-                Rating: {review.rating ?? "Sin rating"}
-              </span>
+  {/* Fila 1 - Negocio seleccionado */}
+  <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+    <h2 className="text-xl font-semibold">
+      {selectedBusiness ? selectedBusiness.name : "Selecciona un negocio"}
+    </h2>
 
-              <span className="rounded-full bg-slate-900 px-2 py-1">
-                Autor: {review.author || "Anónimo"}
-              </span>
+    {selectedBusiness ? (
+      <form onSubmit={handleCreateReview} className="mt-5 space-y-4">
+        <div>
+          <label className="text-sm text-slate-300">Reseña</label>
+          <textarea
+            value={reviewText}
+            onChange={(event) => setReviewText(event.target.value)}
+            className="mt-1 min-h-32 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 outline-none focus:border-cyan-400"
+            placeholder="El hotel estaba muy limpio y el personal fue muy amable, aunque había ruido por la noche."
+            required
+          />
+        </div>
 
-              <span className="rounded-full bg-slate-900 px-2 py-1">
-                Fuente: {review.source || "manual"}
-              </span>
+        <div className="grid gap-4 md:grid-cols-2">
+          <div>
+            <label className="text-sm text-slate-300">Puntuación</label>
+            <input
+              type="number"
+              min={1}
+              max={5}
+              value={reviewRating}
+              onChange={(event) => setReviewRating(Number(event.target.value))}
+              className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 outline-none focus:border-cyan-400"
+            />
+          </div>
 
-              <span className="rounded-full bg-slate-900 px-2 py-1">
-                Idioma: {review.language || "N/D"}
-              </span>
-            </div>
+          <div>
+            <label className="text-sm text-slate-300">Autor</label>
+            <input
+              value={reviewAuthor}
+              onChange={(event) => setReviewAutor(event.target.value)}
+              className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 outline-none focus:border-cyan-400"
+              placeholder="Cliente demo"
+            />
+          </div>
+        </div>
 
-            <p className="mt-3 text-sm leading-6 text-slate-300">
-              {review.text}
-            </p>
-
-            <p className="mt-3 text-xs text-slate-500">
-              Creada el{" "}
-              {new Date(review.created_at).toLocaleString("es-ES")}
-            </p>
-          </article>
-        ))}
-
-        {hasMoreReviews && (
+        <div className="flex flex-col gap-3 md:flex-row">
           <button
-            onClick={() => setShowAllReviews((currentValue) => !currentValue)}
-            className="mt-2 w-full rounded-lg border border-slate-700 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:border-cyan-400 hover:text-cyan-300"
-            >
-              {showAllReviews
-                ? "Ver menos"
-                : `Ver más (${reviews.length - 3} más)`}
-            </button>
-        )}
+            disabled={loading}
+            className="rounded-lg bg-white px-4 py-2 font-semibold text-slate-950 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            Añadir reseña
+          </button>
+
+          <button
+            type="button"
+            onClick={handleRunAnalysis}
+            disabled={loading}
+            className="rounded-lg border border-cyan-400 px-4 py-2 font-semibold text-cyan-300 transition hover:bg-cyan-400/10 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            Ejecutar análisis
+          </button>
+        </div>
+      </form>
+    ) : (
+      <p className="mt-4 text-sm text-slate-400">
+        Crea o selecciona un negocio para añadir reseñas.
+      </p>
+    )}
+  </div>
+
+  {/* Fila 2 - Negocios */}
+  <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+    <h2 className="text-xl font-semibold">Negocios</h2>
+
+    <div className="mt-5 space-y-3">
+      {businesses.length === 0 && (
+        <p className="text-sm text-slate-400">
+          Todavía no hay negocios creados.
+        </p>
+      )}
+
+      {businesses.map((business) => (
+        <button
+          key={business.id}
+          onClick={() => setSelectedBusiness(business)}
+          className={`w-full rounded-xl border p-4 text-left transition ${
+            selectedBusiness?.id === business.id
+              ? "border-cyan-400 bg-cyan-400/10"
+              : "border-slate-800 bg-slate-950 hover:border-slate-600"
+          }`}
+        >
+          <p className="font-semibold">{business.name}</p>
+          <p className="text-sm text-slate-400">
+            {business.category}
+            {business.location ? ` · ${business.location}` : ""}
+          </p>
+        </button>
+      ))}
+    </div>
+  </div>
+
+  {/* Fila 2 - Resumen */}
+  <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+    <h2 className="text-xl font-semibold">Resumen del análisis</h2>
+
+    {summary ? (
+      <div className="mt-5 space-y-6">
+        <div className="grid gap-4 md:grid-cols-4">
+          <SummaryCard label="Reseñas" value={summary.total_reviews} />
+          <SummaryCard label="Positivas" value={summary.positive_reviews} />
+          <SummaryCard label="Neutras" value={summary.neutral_reviews} />
+          <SummaryCard label="Negativas" value={summary.negative_reviews} />
+        </div>
+
+        <div className="rounded-xl border border-slate-800 bg-slate-950 p-4">
+          <p className="text-sm text-slate-400">Sentimiento medio</p>
+          <p className="mt-1 text-3xl font-bold">
+            {summary.average_sentiment_score}
+          </p>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <AspectList
+            title="Aspectos positivos"
+            aspects={summary.top_positive_aspects}
+          />
+          <AspectList
+            title="Aspectos negativos"
+            aspects={summary.top_negative_aspects}
+          />
+        </div>
       </div>
     ) : (
       <p className="mt-4 text-sm text-slate-400">
-        Este negocio todavía no tiene reseñas guardadas.
+        Todavía no hay análisis para este negocio. Añade reseñas y pulsa
+        “Ejecutar análisis”.
       </p>
-    )
-  ) : (
-    <p className="mt-4 text-sm text-slate-400">
-      Selecciona un negocio para ver sus reseñas.
-    </p>
-  )}
-</div>
-            </div>
-          </div>
-        </section>
+    )}
+  </div>
+
+  {/* Fila 3 - Reseñas guardadas a ancho completo */}
+  <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6 lg:col-span-2">
+    <div className="flex items-center justify-between gap-4">
+      <h2 className="text-xl font-semibold">Reseñas guardadas</h2>
+      <span className="rounded-full bg-slate-950 px-3 py-1 text-sm text-slate-400">
+        {reviews.length} reseñas
+      </span>
+    </div>
+
+    {selectedBusiness ? (
+      reviews.length > 0 ? (
+        <div className="mt-5 space-y-4">
+          {visibleReviews.map((review) => (
+            <article
+              key={review.id}
+              className="rounded-xl border border-slate-800 bg-slate-950 p-4"
+            >
+              <div className="flex flex-wrap items-center gap-2 text-xs text-slate-400">
+                <span className="rounded-full bg-slate-900 px-2 py-1">
+                  Rating: {review.rating ?? "Sin rating"}
+                </span>
+
+                <span className="rounded-full bg-slate-900 px-2 py-1">
+                  Autor: {review.author || "Anónimo"}
+                </span>
+
+                <span className="rounded-full bg-slate-900 px-2 py-1">
+                  Fuente: {review.source || "manual"}
+                </span>
+
+                <span className="rounded-full bg-slate-900 px-2 py-1">
+                  Idioma: {review.language || "N/D"}
+                </span>
+              </div>
+
+              <p className="mt-3 text-sm leading-6 text-slate-300">
+                {review.text}
+              </p>
+
+              <p className="mt-3 text-xs text-slate-500">
+                Creada el {new Date(review.created_at).toLocaleString("es-ES")}
+              </p>
+            </article>
+          ))}
+
+          {hasMoreReviews && (
+            <button
+              type="button"
+              onClick={() => setShowAllReviews((currentValue) => !currentValue)}
+              className="mt-2 w-full rounded-lg border border-slate-700 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:border-cyan-400 hover:text-cyan-300"
+            >
+              {showAllReviews
+                ? "Ver menos"
+                : `Ver más reseñas (${reviews.length - 3} más)`}
+            </button>
+          )}
+        </div>
+      ) : (
+        <p className="mt-4 text-sm text-slate-400">
+          Este negocio todavía no tiene reseñas guardadas.
+        </p>
+      )
+    ) : (
+      <p className="mt-4 text-sm text-slate-400">
+        Selecciona un negocio para ver sus reseñas.
+      </p>
+    )}
+  </div>
+</section>
+          
       </div>
     </main>
   );
