@@ -62,3 +62,24 @@ def get_business(
         )
     
     return business
+
+@router.delete(
+    "/{business_id}", 
+    status_code=status.HTTP_204_NO_CONTENT, 
+)
+def delete_business(
+    business_id: int, 
+    db: Session = Depends(get_db), 
+): 
+    business = db.get(Business, business_id) 
+
+    if business is None: 
+        raise HTTPException(
+            status_code = status.HTTP_404_NOT_FOUND, 
+            detail = "Negocio no encontrado", 
+        )
+
+    db.delete(business) 
+    db.commit() 
+
+    return None
