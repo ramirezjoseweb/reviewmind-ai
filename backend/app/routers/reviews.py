@@ -71,3 +71,38 @@ def list_reviews(
     reviews = db.scalars(statement).all() 
 
     return reviews
+
+@router.delete(
+    "/{review_id}", 
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+def delete_review(
+    business_id: int, 
+    review_id: int, 
+    db: Session = Depends(get_db), 
+): 
+    business = db.get(Business, business_id) 
+
+    if business is None: 
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail="Negocio no encontrado", 
+        )
+
+    review = db.scalar(
+        select(Review).where(
+            Review.id == review_id, 
+            Review.business_id == business_id, 
+        )
+    )
+
+    if review is None: 
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail="Negocio no encontrado", 
+        )
+
+    db.delete(review) 
+    db.commit() 
+
+        
