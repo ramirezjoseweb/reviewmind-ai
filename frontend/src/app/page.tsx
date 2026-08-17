@@ -12,6 +12,8 @@ import {
   getBusinesses, 
   getReviews, 
   runAnalysis,
+  deleteReview, 
+  deleteBusiness, 
 } from "@/app/lib/api"; 
 
 export default function Home() {
@@ -178,6 +180,62 @@ export default function Home() {
     }
   }
 
+  async function handleDeleteBusiness() {
+    if(!selectedBusiness) return 
+    
+    const confirmed = window.confirm(
+      "¿Seguro que quieres borrar el negocio?"
+    ); 
+
+    if(!confirmed) return; 
+
+    try {
+      setLoading(true); 
+      setError(""); 
+
+      await deleteBusiness(selectedBusiness.id); 
+
+      const remainingBusiness = await getBusinesses(); 
+
+      setBusinesses(remainingBusiness); 
+      setSelectedBusiness(remainingBusiness[0] ?? null);
+      setReviews([]); 
+      setSummary(null);  
+    } catch (error) {
+      setError(
+        error instanceof Error ? error.message: "Error borrando negocio"
+      ); 
+    } finally {
+      setLoading(false); 
+      
+    }
+  }
+
+  async function handleDeleteReview(reviewId: number) {
+    if(!selectedBusiness) return; 
+
+    const confirmed = window.confirm(
+      "¿Seguro que quieres borrar la reseña?"
+    ); 
+
+    if(!confirmed) return; 
+
+    try {
+      setLoading(true); 
+      setError(""); 
+
+      await deleteReview(selectedBusiness.id, reviewId); 
+      await loadReviews(selectedBusiness.id);  
+      await loadSummary(selectedBusiness.id); 
+    } catch (error) {
+      setError(
+        error instanceof Error ? error.message : "Error borrando la reseña"
+      );
+    } finally {
+      setLoading(false); 
+    }
+  }
+
   return (
     <main className="min-h-screen bg-slate-950 px-6 py-10 text-slate-100">
       <div className="mx-auto max-w-6xl space-y-8">
@@ -251,9 +309,22 @@ export default function Home() {
 
   {/* Fila 1 - Negocio seleccionado */}
   <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
-    <h2 className="text-xl font-semibold">
-      {selectedBusiness ? selectedBusiness.name : "Selecciona un negocio"}
-    </h2>
+    <div className="flex items-start justify-between gap-4">
+      <h2 className="text-xl font-semibold">
+        {selectedBusiness ? selectedBusiness.name : "Selecciona un negocio"}
+      </h2>
+
+      {selectedBusiness && (
+        <button
+          type="button"
+          onClick={handleDeleteBusiness}
+          disabled={loading}
+          className="rounded-lg border border-red-500/50 px-3 py-1.5 text-sm font-semibold text-red-300 transition hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          Eliminar negocio
+        </button>
+      )}
+  </div>
 
     {selectedBusiness ? (
       <form onSubmit={handleCreateReview} className="mt-5 space-y-4">
@@ -404,23 +475,34 @@ export default function Home() {
               key={review.id}
               className="rounded-xl border border-slate-800 bg-slate-950 p-4"
             >
-              <div className="flex flex-wrap items-center gap-2 text-xs text-slate-400">
-                <span className="rounded-full bg-slate-900 px-2 py-1">
-                  Rating: {review.rating ?? "Sin rating"}
-                </span>
+              <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                <div className="flex flex-wrap items-center gap-2 text-xs text-slate-400">
+                  <span className="rounded-full bg-slate-900 px-2 py-1">
+                    Rating: {review.rating ?? "Sin rating"}
+                  </span>
 
-                <span className="rounded-full bg-slate-900 px-2 py-1">
-                  Autor: {review.author || "Anónimo"}
-                </span>
+                  <span className="rounded-full bg-slate-900 px-2 py-1">
+                    Autor: {review.author || "Anónimo"}
+                  </span>
 
-                <span className="rounded-full bg-slate-900 px-2 py-1">
-                  Fuente: {review.source || "manual"}
-                </span>
+                  <span className="rounded-full bg-slate-900 px-2 py-1">
+                    Fuente: {review.source || "manual"}
+                  </span>
 
-                <span className="rounded-full bg-slate-900 px-2 py-1">
-                  Idioma: {review.language || "N/D"}
-                </span>
-              </div>
+                  <span className="rounded-full bg-slate-900 px-2 py-1">
+                    Idioma: {review.language || "N/D"}
+                  </span>
+                </div>
+
+                <button
+    type="button"
+    onClick={() => handleDeleteReview(review.id)}
+    disabled={loading}
+    className="self-start rounded-lg border border-red-500/50 px-3 py-1.5 text-xs font-semibold text-red-300 transition hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-60"
+  >
+    Eliminar
+  </button>
+</div>
 
               <p className="mt-3 text-sm leading-6 text-slate-300">
                 {review.text}

@@ -54,6 +54,10 @@ async function handleResponse<T>(response: Response): Promise<T> {
         throw new Error(errorMessage); 
     }
 
+    if(response.status == 204) {
+        return undefined as T; // los endpoints DELETE suelen devolver 204 No Content
+    }
+
     return response.json() 
 }
 
@@ -119,4 +123,25 @@ export async function getReviews(
         `${API_URL}/businesses/${businessId}/reviews`
     )
     return handleResponse(response) 
+}
+
+export async function deleteBusiness(
+    businessId: number
+): Promise<void> {
+    const response = await fetch(`${API_URL}/businesses/${businessId}`, {
+        method: "DELETE", 
+    }); 
+
+    await handleResponse<void>(response);  
+}
+
+export async function deleteReview(
+    reviewId: number,
+    businessId: number
+): Promise<void> {
+    const response = await fetch(`${API_URL}/businesses/${businessId}/reviews/${reviewId}`, {
+        method: "DELETE", 
+    }); 
+
+    await handleResponse<void>(response); 
 }
