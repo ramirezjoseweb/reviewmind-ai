@@ -136,8 +136,8 @@ export async function deleteBusiness(
 }
 
 export async function deleteReview(
-    reviewId: number,
-    businessId: number
+    businessId: number, 
+    reviewId: number
 ): Promise<void> {
     const response = await fetch(`${API_URL}/businesses/${businessId}/reviews/${reviewId}`, {
         method: "DELETE", 
