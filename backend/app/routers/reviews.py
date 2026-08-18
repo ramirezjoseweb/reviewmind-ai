@@ -1,4 +1,8 @@
-from fastapi import APIRouter, status, Depends, HTTPException
+import io 
+import panda as pd
+
+
+from fastapi import APIRouter, status, Depends, HTTPException, UploadFile
 
 from sqlalchemy.orm import Session
 from sqlalchemy import select

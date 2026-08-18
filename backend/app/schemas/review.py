@@ -19,3 +19,8 @@ class ReviewResponse(ReviewBase):
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True) 
+
+class ReviewImportResponse(BaseModel): 
+    imported_reviews: int
+    skippped_rows: int
+    error: list[str]
