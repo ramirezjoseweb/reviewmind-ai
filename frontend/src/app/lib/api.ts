@@ -45,6 +45,12 @@ export type Review = {
     created_at: string; 
 }; 
 
+export type ReviewImportResult = {
+    imported_reviews: number;  
+    skipped_rows: number; 
+    errors: string[]; 
+}; 
+
 async function handleResponse<T>(response: Response): Promise<T> {
     if(!response.ok) {
         const errorBody = await response.json().catch(() => null); 
@@ -144,4 +150,22 @@ export async function deleteReview(
     }); 
 
     await handleResponse<void>(response); 
+}
+
+export async function importReviewCsv(
+    businessId: number, 
+    file: File
+): Promise<ReviewImportResult> {
+    const formData = new FormData(); 
+    formData.append("file", file); 
+
+    const response = await fetch(
+        `${API_URL}/businesses/${businessId}/reviews/import-csv`, 
+        {
+            method: "POST", 
+            body: formData, 
+        }
+    ); 
+
+    return handleResponse<ReviewImportResult>(response); 
 }

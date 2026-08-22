@@ -6,6 +6,7 @@ import {
   AnalysisSummary,
   Business, 
   Review, 
+  ReviewImportResult,
   createBusiness, 
   createReview,
   getAnalysisSummary,
@@ -14,6 +15,7 @@ import {
   runAnalysis,
   deleteReview, 
   deleteBusiness, 
+  importReviewCsv, 
 } from "@/app/lib/api"; 
 
 export default function Home() {
@@ -39,6 +41,10 @@ export default function Home() {
 
   const [showAllReviews, setShowAllReviews] = useState(false); 
 
+  const [csvFile, setCsvFile] = useState<File | null>(null); 
+  const [importResult, setImportResult] = useState<ReviewImportResult | null>(
+    null
+  )
 
   const visibleReviews = showAllReviews ? reviews : reviews.slice(0, 3); 
   const hasMoreReviews = reviews.length > 3;
@@ -236,6 +242,30 @@ export default function Home() {
     }
   }
 
+  async function handleImportCsv(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault(); 
+
+    if(!selectedBusiness || !csvFile) return; 
+    
+    try{
+      setLoading(true); 
+      setError(""); 
+      setImportResult(null); 
+
+      const result = await importReviewCsv(selectedBusiness.id, csvFile); 
+
+      setImportResult(result); 
+      setCsvFile(null); 
+    
+      await loadReviews(selectedBusiness.id); 
+      await loadSummary(selectedBusiness.id); 
+    } catch (error) {
+      setError (error instanceof Error ? error.message : "Error importando CSV"); 
+    } finally {
+      setLoading(false); 
+    }
+  }
+
   return (
     <main className="min-h-screen bg-slate-950 px-6 py-10 text-slate-100">
       <div className="mx-auto max-w-6xl space-y-8">
@@ -327,65 +357,142 @@ export default function Home() {
   </div>
 
     {selectedBusiness ? (
-      <form onSubmit={handleCreateReview} className="mt-5 space-y-4">
+  <div className="mt-5">
+    <form onSubmit={handleCreateReview} className="space-y-4">
+      <div>
+        <label className="text-sm text-slate-300">Reseña</label>
+        <textarea
+          value={reviewText}
+          onChange={(event) => setReviewText(event.target.value)}
+          className="mt-1 min-h-32 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 outline-none focus:border-cyan-400"
+          placeholder="El hotel estaba muy limpio y el personal fue muy amable, aunque había ruido por la noche."
+          required
+        />
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2">
         <div>
-          <label className="text-sm text-slate-300">Reseña</label>
-          <textarea
-            value={reviewText}
-            onChange={(event) => setReviewText(event.target.value)}
-            className="mt-1 min-h-32 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 outline-none focus:border-cyan-400"
-            placeholder="El hotel estaba muy limpio y el personal fue muy amable, aunque había ruido por la noche."
-            required
+          <label className="text-sm text-slate-300">Puntuación</label>
+          <input
+            type="number"
+            min={1}
+            max={5}
+            value={reviewRating}
+            onChange={(event) => setReviewRating(Number(event.target.value))}
+            className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 outline-none focus:border-cyan-400"
           />
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
-          <div>
-            <label className="text-sm text-slate-300">Puntuación</label>
-            <input
-              type="number"
-              min={1}
-              max={5}
-              value={reviewRating}
-              onChange={(event) => setReviewRating(Number(event.target.value))}
-              className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 outline-none focus:border-cyan-400"
-            />
-          </div>
-
-          <div>
-            <label className="text-sm text-slate-300">Autor</label>
-            <input
-              value={reviewAuthor}
-              onChange={(event) => setReviewAutor(event.target.value)}
-              className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 outline-none focus:border-cyan-400"
-              placeholder="Cliente demo"
-            />
-          </div>
+        <div>
+          <label className="text-sm text-slate-300">Autor</label>
+          <input
+            value={reviewAuthor}
+            onChange={(event) => setReviewAutor(event.target.value)}
+            className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 outline-none focus:border-cyan-400"
+            placeholder="Cliente demo"
+          />
         </div>
+      </div>
 
-        <div className="flex flex-col gap-3 md:flex-row">
-          <button
-            disabled={loading}
-            className="rounded-lg bg-white px-4 py-2 font-semibold text-slate-950 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            Añadir reseña
-          </button>
+      <div className="flex flex-col gap-3 md:flex-row">
+        <button
+          type="submit"
+          disabled={loading}
+          className="rounded-lg bg-white px-4 py-2 font-semibold text-slate-950 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          Añadir reseña
+        </button>
 
-          <button
-            type="button"
-            onClick={handleRunAnalysis}
-            disabled={loading}
-            className="rounded-lg border border-cyan-400 px-4 py-2 font-semibold text-cyan-300 transition hover:bg-cyan-400/10 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            Ejecutar análisis
-          </button>
-        </div>
-      </form>
-    ) : (
-      <p className="mt-4 text-sm text-slate-400">
-        Crea o selecciona un negocio para añadir reseñas.
+        <button
+          type="button"
+          onClick={handleRunAnalysis}
+          disabled={loading}
+          className="rounded-lg border border-cyan-400 px-4 py-2 font-semibold text-cyan-300 transition hover:bg-cyan-400/10 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          Ejecutar análisis
+        </button>
+      </div>
+    </form>
+
+    <div className="mt-6 border-t border-slate-800 pt-6">
+      <h3 className="font-semibold">Importar reseñas desde CSV</h3>
+
+      <p className="mt-2 text-sm text-slate-400">
+        El CSV debe incluir una columna obligatoria{" "}
+        <code className="rounded bg-slate-950 px-1.5 py-0.5 text-cyan-300">
+          text
+        </code>
+        . Opcionales:{" "}
+        <code className="rounded bg-slate-950 px-1.5 py-0.5 text-cyan-300">
+          rating
+        </code>
+        ,{" "}
+        <code className="rounded bg-slate-950 px-1.5 py-0.5 text-cyan-300">
+          author
+        </code>
+        ,{" "}
+        <code className="rounded bg-slate-950 px-1.5 py-0.5 text-cyan-300">
+          source
+        </code>
+        ,{" "}
+        <code className="rounded bg-slate-950 px-1.5 py-0.5 text-cyan-300">
+          language
+        </code>
+        .
       </p>
-    )}
+
+      <form onSubmit={handleImportCsv} className="mt-4 space-y-4">
+        <input
+          type="file"
+          accept=".csv,text/csv"
+          onChange={(event) => {
+            const file = event.target.files?.[0] ?? null;
+            setCsvFile(file);
+          }}
+          className="block w-full cursor-pointer rounded-lg border border-slate-700 bg-slate-950 text-sm text-slate-300 file:mr-4 file:border-0 file:bg-cyan-400 file:px-4 file:py-2 file:font-semibold file:text-slate-950 hover:file:bg-cyan-300"
+        />
+
+        <button
+          type="submit"
+          disabled={loading || !csvFile}
+          className="rounded-lg border border-cyan-400 px-4 py-2 font-semibold text-cyan-300 transition hover:bg-cyan-400/10 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          Importar CSV
+        </button>
+      </form>
+
+      {importResult && (
+        <div className="mt-4 rounded-xl border border-slate-800 bg-slate-950 p-4 text-sm">
+          <p className="text-slate-300">
+            Importadas:{" "}
+            <span className="font-semibold text-cyan-300">
+              {importResult.imported_reviews}
+            </span>
+          </p>
+
+          <p className="mt-1 text-slate-300">
+            Filas omitidas:{" "}
+            <span className="font-semibold text-amber-300">
+              {importResult.skipped_rows}
+            </span>
+          </p>
+
+          {importResult.errors.length > 0 && (
+            <ul className="mt-3 space-y-1 text-xs text-red-300">
+              {importResult.errors.slice(0, 5).map((error) => (
+                <li key={error}>{error}</li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
+    </div>
+  </div>
+) : (
+  <p className="mt-4 text-sm text-slate-400">
+    Crea o selecciona un negocio para añadir reseñas.
+  </p>
+)}
   </div>
 
   {/* Fila 2 - Negocios */}

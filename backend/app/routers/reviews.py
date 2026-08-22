@@ -112,7 +112,7 @@ def delete_review(
     return None 
 
 @router.post(
-    prefix="/import-csv", 
+    "/import-csv", 
     response_model=ReviewImportResponse, 
     status_code=status.HTTP_201_CREATED, 
 )
