@@ -671,7 +671,7 @@ function AspectList({
   aspects,
 }: {
   title: string;
-  aspects: string[];
+  aspects: { name: string; count: number }[];
 }) {
   return (
     <div className="rounded-xl border border-slate-800 bg-slate-950 p-4">
@@ -680,9 +680,16 @@ function AspectList({
       {aspects.length > 0 ? (
         <ul className="mt-3 space-y-2 text-sm text-slate-300">
           {aspects.map((aspect) => (
-            <li key={aspect} className="rounded-lg bg-slate-900 px-3 py-2">
-              {aspect}
-            </li>
+            <li 
+              key={aspect.name}
+              className="flex items-center justify-between gap-3 rounded-lg bg-slate-900 px-3 py-4"
+              >
+                <span>{aspect.name}</span>
+
+                <span className="rounded-full bg-slate-950 px-6 py-1.5 text-xs text-cyan-300">
+                  {aspect.count}
+                </span>
+              </li>
           ))}
         </ul>
       ) : (

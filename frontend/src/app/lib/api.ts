@@ -30,8 +30,8 @@ export type AnalysisSummary = {
     negative_reviews: number; 
     neutral_reviews: number; 
     average_sentiment_score: number; 
-    top_positive_aspects: string[]; 
-    top_negative_aspects: string[]; 
+    top_positive_aspects: AspectCount[]; 
+    top_negative_aspects: AspectCount[]; 
 }; 
 
 export type Review = {
@@ -49,6 +49,11 @@ export type ReviewImportResult = {
     imported_reviews: number;  
     skipped_rows: number; 
     errors: string[]; 
+}; 
+
+export type AspectCount = {
+    name: string; 
+    count: number; 
 }; 
 
 async function handleResponse<T>(response: Response): Promise<T> {
