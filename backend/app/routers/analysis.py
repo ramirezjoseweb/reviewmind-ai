@@ -190,9 +190,17 @@ def get_business_analysis_summary(
         neutral_reviews=neutral_reviews,
         average_sentiment_score=round(average_sentiment_score, 2), 
         top_positive_aspects=[
-            aspect for aspect, _ in positive_counter.most_common(5) 
+            {
+            "name" : aspect, 
+            "count": count, 
+            }
+            for aspect, count in positive_counter.most_common(5) 
         ],
         top_negative_aspects=[
-            aspect for aspect, _ in negative_counter.most_common(5)
+             {
+                 "name": aspect, 
+                 "count": count, 
+             }
+             for aspect, count in negative_counter.most_common(5) 
         ], 
     )

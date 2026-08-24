@@ -12,6 +12,10 @@ class ReviewAnalysisReponse(BaseModel):
 
     model_config = ConfigDict(from_attributes=True) 
 
+class AspectCount(BaseModel): 
+    name: str 
+    count: int    
+
 class BusinessAnalysisSummary(BaseModel):
     business_id: int 
     total_reviews: int 
@@ -20,5 +24,5 @@ class BusinessAnalysisSummary(BaseModel):
     negative_reviews: int 
     neutral_reviews: int
     average_sentiment_score: float
-    top_positive_aspects: list[str]
-    top_negative_aspects: list[str]
+    top_positive_aspects: list[AspectCount]
+    top_negative_aspects: list[AspectCount]
