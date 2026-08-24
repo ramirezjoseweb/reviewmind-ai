@@ -22,5 +22,5 @@ class ReviewResponse(ReviewBase):
 
 class ReviewImportResponse(BaseModel): 
     imported_reviews: int
-    skippped_rows: int
-    error: list[str]
+    skipped_rows: int
+    errors: list[str]
