@@ -1,6 +1,7 @@
 "use client"; 
 
 import { FormEvent, useEffect, useState } from "react";
+import { DashboardCharts } from "@/components/dashboard-charts";
 
 import {
   AnalysisSummary,
@@ -538,6 +539,8 @@ export default function Home() {
           <SummaryCard label="Neutras" value={summary.neutral_reviews} />
           <SummaryCard label="Negativas" value={summary.negative_reviews} />
         </div>
+
+        <DashboardCharts summary = {summary} /> 
 
         <div className="rounded-xl border border-slate-800 bg-slate-950 p-4">
           <p className="text-sm text-slate-400">Sentimiento medio</p>
