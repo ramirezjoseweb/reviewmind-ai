@@ -258,6 +258,7 @@ export default function Home() {
       setImportResult(result); 
       setCsvFile(null); 
     
+      await runAnalysis(selectedBusiness.id); 
       await loadReviews(selectedBusiness.id); 
       await loadSummary(selectedBusiness.id); 
     } catch (error) {
