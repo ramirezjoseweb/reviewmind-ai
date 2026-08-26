@@ -5,7 +5,7 @@ from app.schemas.report import ExecutiveReportResponse
 
 from app.models.business import Business
 from app.models.review import Review
-from app.models.review import ReviewAnalysis
+from app.models.review_analysis import ReviewAnalysis
 
 RECOMMENDATION_BY_ASPECT = {
     "servicio": "Revisar la calidad del servicio, tiempos de respuesta y trato del personal.",
@@ -43,7 +43,7 @@ def generate_executive_report(
     else: 
         average_score = 0 
 
-    positive_counter = Counter[str] = Counter() 
+    positive_counter: Counter[str] = Counter() 
     negative_counter: Counter[str] = Counter() 
 
     for analysis in analyses: 
@@ -100,7 +100,7 @@ def generate_executive_report(
             aspect, 
             f"Revisar el aspecto '{aspect}' porque aparece de forma recurrente en comentarios negativos", 
         )
-        recommendation.append(recommendations) 
+        recommendations.append(recommendation) 
 
     if not recommendations: 
         "Mantener la calidad actual y seguir recopilando reseñas para detectar recomendaciones."

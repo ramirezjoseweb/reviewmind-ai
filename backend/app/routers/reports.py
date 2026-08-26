@@ -7,6 +7,7 @@ from app.schemas.report import ExecutiveReportResponse
 from app.models.business import Business
 from app.models.review import Review
 from app.models.review_analysis import ReviewAnalysis
+from app.services.report_service import generate_executive_report
 
 router = APIRouter(
     prefix="/businesses/{business_id}/reports", 
@@ -51,7 +52,7 @@ def generate_business_report(
             detail="Este negocio no tiene análisis. Ejecuta un análisis antes de generar el informe."
         )
 
-    return generate_business_report(
+    return generate_executive_report(
         business=business,
         reviews=reviews,
         analyses=analyses,
