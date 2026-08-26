@@ -51,4 +51,10 @@ def generate_business_report(
             detail="Este negocio no tiene análisis. Ejecuta un análisis antes de generar el informe."
         )
 
+    return generate_business_report(
+        business=business,
+        reviews=reviews,
+        analyses=analyses,
+    )
+
     
