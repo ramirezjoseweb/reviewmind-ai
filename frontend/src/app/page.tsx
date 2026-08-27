@@ -8,6 +8,7 @@ import {
   Business, 
   Review, 
   ReviewImportResult,
+  ExecutiveReport,
   createBusiness, 
   createReview,
   getAnalysisSummary,
@@ -17,6 +18,7 @@ import {
   deleteReview, 
   deleteBusiness, 
   importReviewCsv, 
+  generateExecutiveReport,
 } from "@/app/lib/api"; 
 
 export default function Home() {
@@ -46,6 +48,10 @@ export default function Home() {
   const [importResult, setImportResult] = useState<ReviewImportResult | null>(
     null
   )
+
+  const [executiveReport, setExecutiveReport] = useState<ExecutiveReport | null> (
+    null
+  ); 
 
   const visibleReviews = showAllReviews ? reviews : reviews.slice(0, 3); 
   const hasMoreReviews = reviews.length > 3;
@@ -103,6 +109,7 @@ export default function Home() {
   // al negocio que el usuario haya seleccionado.
   useEffect(() => {
     setShowAllReviews(false); 
+    setExecutiveReport(null); 
 
     if (selectedBusiness) {
       loadSummary(selectedBusiness.id);
@@ -263,6 +270,29 @@ export default function Home() {
       await loadSummary(selectedBusiness.id); 
     } catch (error) {
       setError (error instanceof Error ? error.message : "Error importando CSV"); 
+    } finally {
+      setLoading(false); 
+    }
+  }
+
+  async function handleGenerateReport() {
+    if(!selectedBusiness) return;
+
+    try{
+      setLoading(true); 
+      setError(""); 
+
+      await runAnalysis(selectedBusiness.id); 
+
+      const report = await generateExecutiveReport(selectedBusiness.id);
+
+      setExecutiveReport(report); 
+
+      await loadSummary(selectedBusiness.id); 
+    } catch (error) {
+      setError(
+        error instanceof Error ? error.message : "Error generando informe"
+      ); 
     } finally {
       setLoading(false); 
     }
@@ -530,7 +560,67 @@ export default function Home() {
 
   {/* Fila 2 - Resumen */}
   <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
-    <h2 className="text-xl font-semibold">Resumen del análisis</h2>
+    <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+      <h2 className="text-xl font-semibold">Resumen del análisis</h2>
+
+      {selectedBusiness && summary && (
+      <button
+        type="button"
+        onClick={handleGenerateReport}
+        disabled={loading}
+        className="rounded-lg border border-cyan-400 px-4 py-2 text-sm font-semibold text-cyan-300 transition hover:bg-cyan-400/10 disabled:cursor-not-allowed disabled:opacity-60"
+      >
+      {loading ? "Generando..." : "Generar informe"}
+      </button>
+  )}
+</div>
+
+{executiveReport && (
+  <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+    <div className="flex flex-col gap-1">
+      <p className="text-sm font-medium uppercase tracking-[0.2em] text-cyan-400">
+        Informe ejecutivo
+      </p>
+      <h2 className="text-2xl font-bold">{executiveReport.business_name}</h2>
+      <p className="text-sm text-slate-500">
+        Generado el{" "}
+        {new Date(executiveReport.generated_at).toLocaleString("es-ES")}
+      </p>
+    </div>
+
+    <div className="mt-6 space-y-5">
+      <ReportSection
+        title="Resumen ejecutivo"
+        content={executiveReport.executive_summary}
+      />
+
+      <ReportSection
+        title="Visión general del sentimiento"
+        content={executiveReport.sentiment_overview}
+      />
+
+      <ReportList
+        title="Fortalezas principales"
+        items={executiveReport.strengths}
+      />
+
+      <ReportList
+        title="Debilidades principales"
+        items={executiveReport.weaknesses}
+      />
+
+      <ReportList
+        title="Recomendaciones"
+        items={executiveReport.recommendations}
+      />
+
+      <ReportList
+        title="Acciones prioritarias"
+        items={executiveReport.priority_actions}
+      />
+    </div>
+  </div>
+)}
 
     {summary ? (
       <div className="mt-5 space-y-6">
@@ -703,4 +793,41 @@ function AspectList({
       )}
     </div>
   );
+}
+
+function ReportSection({
+  title, 
+  content, 
+}: {
+  title: string; 
+  content: string; 
+}) {
+  return (
+    <section className="rounded-x1 border border-slate-800 bg-slate-950 p-4">
+      <h3 className="font-semibold text-slate-100">{title}</h3>
+      <p className="mt-2 text-sm leading-6 text-slate-300">{content}</p>
+    </section>
+  ); 
+}
+
+function ReportList({
+  title,
+  items, 
+}: {
+  title: string; 
+  items: string[]; 
+}) {
+  return (
+    <section className="rounded-x1 border border-slate-800 bg-slate-950 p-4">
+      <h3 className="font-semibold text-slate-100">{title}</h3>"
+
+      <ul className="mt-3 space-y-2 text-sm leading-6 text-slate-300">
+        {items.map((item) => (
+          <li key={item} className="rounded-lg bg-slate-900 px-3 py-2">
+            {item}
+          </li>   
+        ))}
+      </ul>
+    </section>
+  )
 }

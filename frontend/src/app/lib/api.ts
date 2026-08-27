@@ -56,6 +56,18 @@ export type AspectCount = {
     count: number; 
 }; 
 
+export type ExecutiveReport = {
+    business_id: number; 
+    business_name: string; 
+    generated_at: string; 
+    executive_summary: string; 
+    sentiment_overview: string; 
+    strengths: string[]; 
+    weaknesses: string[]; 
+    recommendations: string[]; 
+    priority_actions: string[]; 
+};
+
 async function handleResponse<T>(response: Response): Promise<T> {
     if(!response.ok) {
         const errorBody = await response.json().catch(() => null); 
@@ -173,4 +185,17 @@ export async function importReviewCsv(
     ); 
 
     return handleResponse<ReviewImportResult>(response); 
+}
+
+export async function generateExecutiveReport(
+    businessId: number, 
+): Promise<ExecutiveReport> {
+    const response = await fetch(
+        `${API_URL}/businesses/${businessId}/reports/generate`, 
+        {
+            method: "POST", 
+        }
+    ); 
+
+    return handleResponse<ExecutiveReport>(response); 
 }
