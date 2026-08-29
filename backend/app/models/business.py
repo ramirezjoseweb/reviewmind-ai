@@ -1,11 +1,14 @@
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import Integer, String, DateTime
 
 from app.db.database import Base # importa la clase Base desde el archivo database.py, lo que permite que la clase Business herede de ella y se convierta en una tabla de la base de datos.
 
-from app.models.review import Review
+if TYPE_CHECKING:
+    from app.models.review import Review
+    from app.models.report import Report
 
 class Business(Base): 
     __tablename__ = "businesses"
@@ -24,4 +27,9 @@ class Business(Base):
     reviews: Mapped[list["Review"]] = relationship(
         back_populates="business", 
         cascade="all, delete-orphan", # esto significa que si se elimina un negocio, todas las reseñas asociadas a ese negocio también se eliminarán automáticamente. La opción delete-orphan indica que si una reseña ya no está asociada a ningún negocio, también se eliminará automáticamente de la base de datos.
+    )
+
+    reports: Mapped[list["Report"]] = relationship(
+        back_populates="business", 
+        cascade="all, delete-orphan", 
     )
