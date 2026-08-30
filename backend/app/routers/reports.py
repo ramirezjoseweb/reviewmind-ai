@@ -7,12 +7,30 @@ from app.schemas.report import ExecutiveReportResponse
 from app.models.business import Business
 from app.models.review import Review
 from app.models.review_analysis import ReviewAnalysis
+from app.models.report import Report
 from app.services.report_service import generate_executive_report
 
 router = APIRouter(
     prefix="/businesses/{business_id}/reports", 
     tags=["Reports"], 
 )
+
+def build_report_response(
+        report: Report, 
+        business: Business, 
+) -> ExecutiveReportResponse: 
+    return ExecutiveReportResponse(
+        id=report.id, 
+        business_id=business.id, 
+        business_name=business.name,
+        generated_at=report.created_at, 
+        executive_summary=report.executive_summary, 
+        sentiment_overview=report.sentiment_overview, 
+        strengths=report.strengths, 
+        weaknesses=report.weaknesses, 
+        recommendations=report.recommendations,
+        priority_actions=report.priority_actions, 
+    )
 
 @router.post(
     "/generate", 
@@ -52,10 +70,81 @@ def generate_business_report(
             detail="Este negocio no tiene análisis. Ejecuta un análisis antes de generar el informe."
         )
 
-    return generate_executive_report(
-        business=business,
-        reviews=reviews,
-        analyses=analyses,
+    draft = generate_executive_report(
+        business=business, 
+        reviews=reviews, 
+        analyses=analyses, 
     )
 
-    
+    report = Report(
+        business_id=business.id,
+        executive_summary=draft.executive_summary,
+        sentiment_overview=draft.sentiment_overview,
+        strengths=draft.strengths,
+        weaknesses=draft.weaknesses,
+        recommendations=draft.recommendations,
+        priority_actions=draft.priority_actions,
+    )
+
+    db.add(report)
+    db.commit() 
+    db.refresh(report)
+
+    return build_report_response(report=report, business=business)
+
+@router.get(
+    "", 
+    response_model=list[ExecutiveReportResponse]
+)
+def list_business_reports(
+    business_id: int, 
+    db: Session = Depends(get_db), 
+): 
+    business = db.get(Business, business_id) 
+
+    if business is None: 
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail="Negocio no encontrado"
+        )
+
+    reports = db.scalars(
+        select(Report)
+        .where(Report.business_id == business_id)
+        .order_by(Report.created_at.desc())
+    ).all()
+
+    return [
+        build_report_response(report=report, business= business)
+        for report in reports
+    ]
+
+@router.get(
+    "/latest",
+    response_model=ExecutiveReportResponse 
+)
+def get_latest_business_report(
+    business_id: int, 
+    db: Session = Depends(get_db), 
+): 
+    business = get_db(Business, business_id)
+
+    if business is None: 
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail="Negocio no encontrado", 
+        )
+
+    report = db.scalars(
+        select(Report)
+        .where(Report.business_id == business_id)
+        .order(Report.created_at.desc())
+    )
+
+    if report is None: 
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail="No se han encontrado informes",
+        )
+
+    return build_report_response(report=report, business=business) 

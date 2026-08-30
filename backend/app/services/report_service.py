@@ -1,7 +1,7 @@
 from datetime import datetime
 from collections import Counter
 
-from app.schemas.report import ExecutiveReportResponse
+from app.schemas.report import ExecutiveReportDraft
 
 from app.models.business import Business
 from app.models.review import Review
@@ -22,7 +22,7 @@ def generate_executive_report(
     business: Business, 
     reviews: list[Review], 
     analyses: list[ReviewAnalysis], 
-) -> ExecutiveReportResponse: 
+) -> ExecutiveReportDraft: 
     total_reviews = len(reviews) 
     analyzed_reviews = len(analyses)
 
@@ -111,7 +111,7 @@ def generate_executive_report(
         top_negative=top_negative,  
     )
     
-    return ExecutiveReportResponse(
+    return ExecutiveReportDraft(
         business_id=business.id, 
         business_name=business.name,
         generated_at=datetime.utcnow(),

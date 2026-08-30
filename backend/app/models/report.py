@@ -14,7 +14,9 @@ class Report(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True,) 
     business_id: Mapped[int] = mapped_column(
-        ForeignKey("businesses.id", ondelete="CASCADE", nullable=False, index=True,) 
+        ForeignKey("businesses.id", ondelete="CASCADE"), 
+        nullable=False, 
+        index=True, 
     )
     executive_summary: Mapped[str] = mapped_column(Text, nullable=False,)
     sentiment_overview: Mapped[str] = mapped_column(Text, nullable=False,) 
