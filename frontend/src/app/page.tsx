@@ -19,6 +19,7 @@ import {
   deleteBusiness, 
   importReviewCsv, 
   generateExecutiveReport,
+  getLatestExecutiveReport,
 } from "@/app/lib/api"; 
 
 export default function Home() {
@@ -96,6 +97,16 @@ export default function Home() {
     }
   }
 
+  async function loadLatestReport(businessId: number) {
+    try {
+      setError(""); 
+      const data = await getLatestExecutiveReport(businessId); 
+      setExecutiveReport(data); 
+    } catch (error) {
+      setExecutiveReport(null) 
+    }
+  }
+
   // Cargamos los negocios al montar el componente.
   // El array de dependencia vacío [] asegura que la llamada
   // se ejecute solo una vez y no en cada renderizado.
@@ -114,6 +125,7 @@ export default function Home() {
     if (selectedBusiness) {
       loadSummary(selectedBusiness.id);
       loadReviews(selectedBusiness.id);
+      loadLatestReport(selectedBusiness.id); 
     }
     else {
       setReviews([]); 
@@ -166,6 +178,7 @@ export default function Home() {
         language: "es", 
       }); 
 
+      setExecutiveReport(null);
       setReviewText(""); 
       setReviewRating(5); 
       setReviewAutor(""); 
@@ -239,6 +252,7 @@ export default function Home() {
       setError(""); 
 
       await deleteReview(selectedBusiness.id, reviewId); 
+      setExecutiveReport(null);
       await loadReviews(selectedBusiness.id);  
       await loadSummary(selectedBusiness.id); 
     } catch (error) {
@@ -264,6 +278,7 @@ export default function Home() {
 
       setImportResult(result); 
       setCsvFile(null); 
+      setExecutiveReport(null);
     
       await runAnalysis(selectedBusiness.id); 
       await loadReviews(selectedBusiness.id); 
@@ -583,7 +598,7 @@ export default function Home() {
       </p>
       <h2 className="text-2xl font-bold">{executiveReport.business_name}</h2>
       <p className="text-sm text-slate-500">
-        Generado el{" "}
+        Último informe guardado ·{" "}
         {new Date(executiveReport.generated_at).toLocaleString("es-ES")}
       </p>
     </div>

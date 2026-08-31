@@ -57,6 +57,7 @@ export type AspectCount = {
 }; 
 
 export type ExecutiveReport = {
+    id: number; 
     business_id: number; 
     business_name: string; 
     generated_at: string; 
@@ -198,4 +199,14 @@ export async function generateExecutiveReport(
     ); 
 
     return handleResponse<ExecutiveReport>(response); 
+}
+
+export async function getLatestExecutiveReport(
+    businessId: number
+): Promise<ExecutiveReport> {
+    const response = await fetch (
+        `${API_URL}/businesses/${businessId}/reports/latest`
+    ); 
+
+    return handleResponse<ExecutiveReport>(response) 
 }
