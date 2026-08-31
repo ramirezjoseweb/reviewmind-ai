@@ -127,7 +127,7 @@ def get_latest_business_report(
     business_id: int, 
     db: Session = Depends(get_db), 
 ): 
-    business = get_db(Business, business_id)
+    business = db.get(Business, business_id)
 
     if business is None: 
         raise HTTPException(
@@ -135,10 +135,10 @@ def get_latest_business_report(
             detail="Negocio no encontrado", 
         )
 
-    report = db.scalars(
+    """report = db.scalars(
         select(Report)
         .where(Report.business_id == business_id)
-        .order(Report.created_at.desc())
+        .order_by(Report.created_at.desc())
     )
 
     if report is None: 
@@ -146,5 +146,22 @@ def get_latest_business_report(
             status_code=status.HTTP_404_NOT_FOUND, 
             detail="No se han encontrado informes",
         )
+    """
+
+    statement = (
+        select(Report)
+        .where(Report.business_id == business_id)
+        .order_by(Report.created_at.desc())
+        .limit(1) 
+    )
+
+    report = db.scalars(statement).first()
+
+    if report is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No hay informes generados para este negocio",
+        )
+
 
     return build_report_response(report=report, business=business) 
