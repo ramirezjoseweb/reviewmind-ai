@@ -20,6 +20,7 @@ import {
   importReviewCsv, 
   generateExecutiveReport,
   getLatestExecutiveReport,
+  downloadLatestExecutiveReportPdf
 } from "@/app/lib/api"; 
 
 export default function Home() {
@@ -313,6 +314,37 @@ export default function Home() {
     }
   }
 
+  async function handleDownloadReportPdf() {
+  if (!selectedBusiness || !executiveReport) return;
+
+  try {
+    setLoading(true);
+    setError("");
+
+    const blob = await downloadLatestExecutiveReportPdf(selectedBusiness.id);
+    const url = window.URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `reviewmind-${selectedBusiness.name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "")}-informe.pdf`;
+
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    window.URL.revokeObjectURL(url);
+  } catch (error) {
+    setError(
+      error instanceof Error ? error.message : "Error descargando PDF"
+    );
+  } finally {
+    setLoading(false);
+  }
+}
+
   return (
     <main className="min-h-screen bg-slate-950 px-6 py-10 text-slate-100">
       <div className="mx-auto max-w-6xl space-y-8">
@@ -591,16 +623,27 @@ export default function Home() {
 </div>
 
 {executiveReport && (
-  <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
-    <div className="flex flex-col gap-1">
-      <p className="text-sm font-medium uppercase tracking-[0.2em] text-cyan-400">
-        Informe ejecutivo
-      </p>
-      <h2 className="text-2xl font-bold">{executiveReport.business_name}</h2>
-      <p className="text-sm text-slate-500">
-        Último informe guardado ·{" "}
-        {new Date(executiveReport.generated_at).toLocaleString("es-ES")}
-      </p>
+  <div>
+    <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+      <div className="flex flex-col gap-1">
+        <p className="text-sm font-medium uppercase tracking-[0.2em] text-cyan-400">
+          Informe ejecutivo
+        </p>
+        <h2 className="text-2xl font-bold">{executiveReport.business_name}</h2>
+        <p className="text-sm text-slate-500">
+          Último informe guardado ·{" "}
+          {new Date(executiveReport.generated_at).toLocaleString("es-ES")}
+        </p>
+      </div>
+
+      <button
+        type="button"
+        onClick={handleDownloadReportPdf}
+        disabled={loading}
+        className="rounded-lg border border-cyan-400 px-4 py-2 text-sm font-semibold text-cyan-300 transition hover:bg-cyan-400/10 disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        {loading ? "Preparando PDF..." : "Descargar PDF"}
+      </button>
     </div>
 
     <div className="mt-6 space-y-5">

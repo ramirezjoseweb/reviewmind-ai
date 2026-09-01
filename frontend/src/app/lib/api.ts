@@ -1,3 +1,5 @@
+import { error } from "console";
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000"; 
 
 export type Business = {
@@ -209,4 +211,22 @@ export async function getLatestExecutiveReport(
     ); 
 
     return handleResponse<ExecutiveReport>(response) 
+}
+
+export async function downloadLatestExecutiveReportPdf(
+    businessId: number
+): Promise<Blob> {
+    const response = await fetch(
+        `${API_URL}/businesses/${businessId}/reports/latest/pdf`
+    ); 
+
+    if(!response.ok){
+        const errorBody = await response.json().catch(() => null); 
+        const errorMessage = 
+            errorBody?.detail ?? `HTTP error ${response.status}`;
+            
+        throw new Error(errorMessage); 
+    }
+
+    return response.blob() 
 }
