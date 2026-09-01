@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
+from fastapi.responses import StreamingResponse
+
 
 from app.db.database import get_db
 from app.schemas.report import ExecutiveReportResponse
@@ -9,6 +11,7 @@ from app.models.review import Review
 from app.models.review_analysis import ReviewAnalysis
 from app.models.report import Report
 from app.services.report_service import generate_executive_report
+from app.services.pdf_report_service import build_report_filename, build_report_pdf
 
 router = APIRouter(
     prefix="/businesses/{business_id}/reports", 
@@ -165,3 +168,43 @@ def get_latest_business_report(
 
 
     return build_report_response(report=report, business=business) 
+
+@router.get("/latest/pdf")
+def download_latest_business_report_pdf(
+    business_id: int, 
+    db: Session = Depends(get_db) 
+): 
+    business = db.get(Business, business_id)
+
+    if business is None: 
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail="No se encuentra el negocio"
+        )
+
+    report = db.scalar(
+        select(Report)
+        .where(Report.business_id == business_id) 
+        .order_by(Report.created_at.desc())
+    )
+
+    if report is None: 
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail="No se han encontrado informes para este negocio"
+        )
+
+    pdf_buffer = build_report_pdf(
+        business = business, 
+        report = report, 
+    )
+
+    filename = build_report_filename(business.name) 
+
+    return StreamingResponse(
+        pdf_buffer, 
+        media_type="application/pdf", 
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"', 
+        },
+    ) 

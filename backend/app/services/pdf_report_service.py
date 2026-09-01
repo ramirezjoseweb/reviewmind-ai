@@ -179,8 +179,11 @@ def add_list_section(
 
 
 def build_report_filename(business_name: str) -> str:
+    # Convierte el nombre a minúsculas y elimina espacios en blanco al inicio y final
     clean_name = business_name.lower().strip()
+    # Reemplaza cualquier carácter que no sea letra, número o guión con un guión
     clean_name = sub(r"[^a-z0-9]+", "-", clean_name)
+    # Elimina guiones al inicio y final, y usa "negocio" como valor por defecto si queda vacío
     clean_name = clean_name.strip("-") or "negocio"
 
     return f"reviewmind-{clean_name}-informe.pdf"
