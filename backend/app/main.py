@@ -1,13 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.db.database import Base, engine
-from app.models.business import Business
-from app.models.review import Review
-from app.models.review_analysis import ReviewAnalysis
 from app.routers import businesses, reviews, analysis, reports
-
-Base.metadata.create_all(bind=engine) # crea todas las tablas definidas en la clase Base en la base de datos, utilizando el motor de base de datos especificado en la variable engine. Esto asegura que todas las tablas necesarias estén presentes en la base de datos antes de que se realicen operaciones en ella.
 
 app = FastAPI(
     title="ReviewMind API", 
