@@ -60,7 +60,7 @@ def generate_ai_executive_report(
     return ExecutiveReportDraft(
         business_id=business.id, 
         business_name=business.name,
-        generated_at=payload["generated_at"], 
+        generated_at=datetime.utcnow(), 
         executive_summary=parsed_report["executive_summary"],
         sentiment_overview=parsed_report["sentiment_overview"],
         strengths=parsed_report["strengths"],
@@ -106,7 +106,7 @@ def build_report_payload(
     analysis_samples = [
         {
             "sentiment": analysis.sentiment, 
-            "sentiment_score": analysis.score, 
+            "sentiment_score": analysis.sentiment_score, 
             "positive_aspects": analysis.positive_aspects, 
             "negative_aspects": analysis.negative_aspects,
         }
@@ -114,7 +114,7 @@ def build_report_payload(
     ]
 
     return {
-        "generated_at": datetime.utcnow(),        
+        "generated_at": datetime.utcnow().isoformat(),        
         "business": {
             "id": business.id, 
             "name": business.name, 

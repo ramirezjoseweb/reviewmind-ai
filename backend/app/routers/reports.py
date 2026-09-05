@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from fastapi.responses import StreamingResponse
 
 
+from app.config import settings
 from app.db.database import get_db
 from app.schemas.report import ExecutiveReportResponse
 from app.models.business import Business
@@ -12,6 +13,7 @@ from app.models.review_analysis import ReviewAnalysis
 from app.models.report import Report
 from app.services.report_service import generate_executive_report
 from app.services.pdf_report_service import build_report_filename, build_report_pdf
+from app.services.ai_report_service import generate_ai_executive_report
 
 router = APIRouter(
     prefix="/businesses/{business_id}/reports", 
@@ -73,11 +75,29 @@ def generate_business_report(
             detail="Este negocio no tiene análisis. Ejecuta un análisis antes de generar el informe."
         )
 
-    draft = generate_executive_report(
-        business=business, 
-        reviews=reviews, 
-        analyses=analyses, 
-    )
+    if settings.enable_ai_reports:
+        try:
+            print("AI reports enabled. Trying OpenAI...")
+            raft = generate_ai_executive_report(
+                business=business,
+                reviews=reviews,
+                analyses=analyses,
+            )
+            print("OpenAI report generated successfully.")
+        except Exception as error:
+            print(f"OpenAI report failed. Falling back to rules. Error: {error}")
+            draft = generate_executive_report(
+                business=business,
+                reviews=reviews,
+                analyses=analyses,
+            )
+    else:
+        print("AI reports disabled. Using rules report.")
+        draft = generate_executive_report(
+            business=business,
+            reviews=reviews,
+            analyses=analyses,
+        )
 
     report = Report(
         business_id=business.id,
