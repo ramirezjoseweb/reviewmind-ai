@@ -77,22 +77,19 @@ def generate_business_report(
 
     if settings.enable_ai_reports:
         try:
-            print(f"Informes IA habilitados. Probando {settings.ai_report_provider}...")
             draft = generate_ai_executive_report(
                 business=business,
                 reviews=reviews,
                 analyses=analyses,
             )
             print("OpenAI report generated successfully.")
-        except Exception as error:
-            print(f"{settings.ai_report_provider} informe generado satisfactoriamente.")
+        except Exception:
             draft = generate_executive_report(
                 business=business,
                 reviews=reviews,
                 analyses=analyses,
             )
     else:
-        print(f"AI reports disabled. Using rules report.")
         draft = generate_executive_report(
             business=business,
             reviews=reviews,
