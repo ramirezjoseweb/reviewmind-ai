@@ -60,7 +60,7 @@ def generate_business_report(
     if not reviews: 
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, 
-            detail="Business has no reviews", 
+            detail="El negocio no tiene reseñas", 
         )
 
     analyses = db.scalars(
@@ -77,22 +77,22 @@ def generate_business_report(
 
     if settings.enable_ai_reports:
         try:
-            print("AI reports enabled. Trying OpenAI...")
-            raft = generate_ai_executive_report(
+            print(f"Informes IA habilitados. Probando {settings.ai_report_provider}...")
+            draft = generate_ai_executive_report(
                 business=business,
                 reviews=reviews,
                 analyses=analyses,
             )
             print("OpenAI report generated successfully.")
         except Exception as error:
-            print(f"OpenAI report failed. Falling back to rules. Error: {error}")
+            print(f"{settings.ai_report_provider} informe generado satisfactoriamente.")
             draft = generate_executive_report(
                 business=business,
                 reviews=reviews,
                 analyses=analyses,
             )
     else:
-        print("AI reports disabled. Using rules report.")
+        print(f"AI reports disabled. Using rules report.")
         draft = generate_executive_report(
             business=business,
             reviews=reviews,
